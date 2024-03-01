@@ -1,0 +1,20 @@
+{
+  "name": "zora-sdk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@zoralabs/protocol-sdk": "^0.5.4",
+    "viem": "^1.21.4"
+  }
+}
