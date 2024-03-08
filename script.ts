@@ -1,7 +1,8 @@
 import {createPremintClient} from "@zoralabs/protocol-sdk";
 import type {Address, PublicClient, WalletClient} from "viem";
 import { createPublicClient, createWalletClient, http } from 'viem'
-import { baseSepolia } from 'viem/chains'
+import { privateKeyToAccount } from 'viem/accounts'
+import { base } from 'viem/chains'
 
 async function createForFree({
   walletClient,
@@ -47,27 +48,25 @@ async function createForFree({
 }
 
 async function main() {
-  const client = createPublicClient({
-    chain: baseSepolia,
+  const cl = createPublicClient({
+    chain: base,
     transport: http(),
   })
-  const blockNumber = await client.getBlockNumber()
+  const blockNumber = await cl.getBlockNumber()
   console.log('blockNumber', blockNumber)
 
-  // const client = usePublicClient({
-  //   chainId: baseSepolia.id,
-  // })
-
+  const account = privateKeyToAccount('<0xPK>')
+  account.address
   const wc = createWalletClient({
-    chain: baseSepolia,
+    account,
+    chain: base,
     transport: http()
   })
 
   const {uid, tokenContractAddress} = await createForFree({
     walletClient: wc,
-    publicClient: client,
-    // address of the token contract
-    creatorAccount: '0xe16Bd85C59f7A75350350676D798A1C193F9e7f0'
+    publicClient: cl as PublicClient,
+    creatorAccount: "0x65318ba4d49C1da4B05F2632bB50e29637ed5A64",
   })
 
   console.log('uid', uid)
