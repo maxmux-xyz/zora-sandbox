@@ -1,8 +1,8 @@
-import {createPremintClient} from "@zoralabs/protocol-sdk";
-import type {Address, PublicClient, WalletClient} from "viem";
-import { createPublicClient, createWalletClient, http } from 'viem'
+import {createPremintClient, PremintConfigVersion} from "@zoralabs/protocol-sdk";
+import type {PublicClient, WalletClient} from "viem";
+import { createPublicClient, createWalletClient, http, Account } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
-import { base } from 'viem/chains'
+import { zoraSepolia } from 'viem/chains'
 
 async function createForFree({
   walletClient,
@@ -14,25 +14,28 @@ async function createForFree({
   // public client that will simulate the transaction
   publicClient: PublicClient;
   // address of the token contract
-  creatorAccount: Address;
+  creatorAccount: Account;
 }) {
   const premintClient = createPremintClient({chain: walletClient.chain!, publicClient: publicClient});
-
+  
   // create and sign a free token creation.
   const createdPremint = await premintClient.createPremint({
     walletClient,
-    creatorAccount,
+    creatorAccount: creatorAccount,
     // if true, will validate that the creator is authorized to create premints on the contract.
     checkSignature: true,
     // collection info of collection to create
+    premintConfigVersion: PremintConfigVersion.V2,
+
     collection: {
-      contractAdmin: creatorAccount,
+      contractAdmin: creatorAccount.address,
       contractName: "Testing Contract",
-      contractURI: "ipfs://bafkreiainxen4b4wz4ubylvbhons6rembxdet4a262nf2lziclqvv7au3e",
+      contractURI: "ipfs://bafyreiaclymbwcpndix6j5buj3342gruopdyke23b3llbbdegpaxjxkyuq",
     },
     // token info of token to create
     tokenCreationConfig: {
-      tokenURI: "ipfs://bafkreice23maski3x52tsfqgxstx3kbiifnt5jotg3a5ynvve53c4soi2u",
+      tokenURI: "ipfs://bafyreiaclymbwcpndix6j5buj3342gruopdyke23b3llbbdegpaxjxkyuq",
+      createReferral: "0xe16Bd85C59f7A75350350676D798A1C193F9e7f0", // Referral address, platform address that will get fees.
     },
   });
 
@@ -49,24 +52,24 @@ async function createForFree({
 
 async function main() {
   const cl = createPublicClient({
-    chain: base,
+    chain: zoraSepolia,
     transport: http(),
   })
   const blockNumber = await cl.getBlockNumber()
   console.log('blockNumber', blockNumber)
 
-  const account = privateKeyToAccount('<0xPK>')
+  const account = privateKeyToAccount('0x<YOURPK>') // Creator account, will be owner of the collection
   account.address
   const wc = createWalletClient({
     account,
-    chain: base,
+    chain: zoraSepolia,
     transport: http()
   })
 
   const {uid, tokenContractAddress} = await createForFree({
     walletClient: wc,
     publicClient: cl as PublicClient,
-    creatorAccount: "0x65318ba4d49C1da4B05F2632bB50e29637ed5A64",
+    creatorAccount: account,
   })
 
   console.log('uid', uid)
